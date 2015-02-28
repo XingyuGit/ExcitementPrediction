@@ -1,5 +1,3 @@
-__author__ = 'TerryChen'
-
 import os
 import pandas as pd
 
