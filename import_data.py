@@ -14,7 +14,7 @@ def get_outcomes_df():
     fn = 'outcomes.csv'
     outcomes_df = __read_file(fn)
     outcomes_df['y'] = 0
-    outcomes_df['y'][outcome_df['is_exciting'] == 't'] = 1
+    outcomes_df['y'][outcomes_df['is_exciting'] == 't'] = 1
     return outcomes_df
 
 
