@@ -6,7 +6,7 @@ __folder = "Data"
 
 def __read_file(fn):
     print('Reading file: ' + fn + '...')
-    data_df = pd.read_csv(os.path.join(__folder), fn)
+    data_df = pd.read_csv(os.path.join(__folder, fn))
     return data_df
 
 
