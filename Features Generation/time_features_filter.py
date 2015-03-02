@@ -6,10 +6,11 @@ __author__ = 'TerryChen'
 
 import sys
 import os
-import import_data
 import pandas as pd
 import datetime
 import numpy as np
+sys.path.append('..')
+import import_data
 
 def _timedelta(d):
     return datetime.timedelta(days=d)
@@ -60,7 +61,7 @@ def _cnt_wk_bwk_mth_combination(df, key):
 
 if __name__ == '__main__':
     # if path is not specified, default is 'Data'
-    path = sys.argv[1] if len(sys.argv) > 1 else 'Data'
+    path = sys.argv[1] if len(sys.argv) > 1 else '../Data'
     projects_df = import_data.get_projects_df(path)
     projects_df = projects_df[['projectid', 'schoolid', 'date_posted', 'school_city', 'school_zip', 'total_price_excluding_optional_support']]
 
