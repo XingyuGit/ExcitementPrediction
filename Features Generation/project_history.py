@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     # write to csv
     df = pd.merge(df, df2)
-    df[list_to_write].to_csv('project_history.csv')
+    df[list_to_write].to_csv(os.path.join('Features_csv', 'project_history.csv'), index=False)
 
 
 
