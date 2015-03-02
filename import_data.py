@@ -31,6 +31,10 @@ def get_projects_df():
     projects_df['group'][projects_df['date_posted'] >= '2014-01-01'] = 'test'
     return projects_df
 
+def get_donations_df():
+    fn = 'donations.csv'
+    donations_df = __read_file(fn)
+    return donations_df
 
 def get_essays_df():
     fn = 'essays.csv'
