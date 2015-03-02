@@ -10,15 +10,15 @@ def __read_file(fn):
     return data_df
 
 
-def get_outcome_df():
+def get_outcomes_df():
     fn = 'outcomes.csv'
-    outcome_df = __read_file(fn)
-    outcome_df['y'] = 0
-    outcome_df['y'][outcome_df['is_exciting'] == 't'] = 1
-    return outcome_df
+    outcomes_df = __read_file(fn)
+    outcomes_df['y'] = 0
+    outcomes_df['y'][outcomes_df['is_exciting'] == 't'] = 1
+    return outcomes_df
 
 
-def get_project_df():
+def get_projects_df():
     fn = 'projects.csv'
     projects_df = __read_file(fn)
     # only data after 2010-4-1 will be used
