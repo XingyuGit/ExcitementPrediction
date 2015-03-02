@@ -7,10 +7,11 @@ __author__ = 'TerryChen'
 
 import sys
 import os
-import import_data
 import pandas as pd
 import datetime
 import numpy as np
+sys.path.append('..')
+import import_data
 
 def _set_shift(df, key, key_shift):
     df[key_shift] = df[key]
@@ -37,7 +38,7 @@ def _get_prev_price(df):
 
 if __name__ == '__main__':
     # if path is not specified, default is 'Data'
-    path = sys.argv[1] if len(sys.argv) > 1 else 'Data'
+    path = sys.argv[1] if len(sys.argv) > 1 else '../Data'
     projects_df = import_data.get_projects_df(path)
     projects_df = projects_df[['projectid', 'date_posted', 'schoolid', 'school_city', 'school_zip', 'total_price_including_optional_support']]
 
