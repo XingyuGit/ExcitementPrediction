@@ -1,26 +1,24 @@
 import os
 import pandas as pd
 
-__folder = "Data"
 
-
-def __read_file(fn):
+def __read_file(path, fn):
     print('Reading file: ' + fn + '...')
-    data_df = pd.read_csv(os.path.join(__folder, fn))
+    data_df = pd.read_csv(os.path.join(path, fn))
     return data_df
 
 
-def get_outcomes_df():
+def get_outcomes_df(path):
     fn = 'outcomes.csv'
-    outcomes_df = __read_file(fn)
+    outcomes_df = __read_file(path, fn)
     outcomes_df['y'] = 0
     outcomes_df['y'][outcomes_df['is_exciting'] == 't'] = 1
     return outcomes_df
 
 
-def get_projects_df():
+def get_projects_df(path):
     fn = 'projects.csv'
-    projects_df = __read_file(fn)
+    projects_df = __read_file(path, fn)
     # only data after 2010-4-1 will be used
     # for complete model building, training data  is from 2010-4-1 to 2014-1-1 (exclusive)
     # for optimization, use validation data to optimize performance
@@ -36,15 +34,15 @@ def get_donations_df():
     donations_df = __read_file(fn)
     return donations_df
 
-def get_essays_df():
+def get_essays_df(path):
     fn = 'essays.csv'
-    essays_df = __read_file(fn)
+    essays_df = __read_file(path, fn)
     return essays_df
 
 
-def get_resources_df():
+def get_resources_df(path):
     fn = 'resources.csv'
-    resources_df = __read_file(fn)
+    resources_df = __read_file(path, fn)
     return resources_df
 
 
