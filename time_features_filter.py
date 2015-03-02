@@ -1,5 +1,9 @@
 __author__ = 'TerryChen'
 
+#
+#   Features # 20 - 24, 7
+#
+
 import sys
 import os
 import import_data
@@ -58,7 +62,7 @@ if __name__ == '__main__':
     # if path is not specified, default is 'Data'
     path = sys.argv[1] if len(sys.argv) > 1 else 'Data'
     projects_df = import_data.get_projects_df(path)
-    projects_df = projects_df[['projectid', 'schoolid', 'date_posted', 'school_city', 'school_zip']]
+    projects_df = projects_df[['projectid', 'schoolid', 'date_posted', 'school_city', 'school_zip', 'total_price_excluding_optional_support']]
 
     # delta of date
     date_delta = [_timedelta(1), _timedelta(2), _timedelta(3), _timedelta(4), _timedelta(5), _timedelta(6)]
@@ -75,7 +79,12 @@ if __name__ == '__main__':
     projects_df = _cnt_wk_bwk_mth_combination(projects_df, 'school_zip')
     projects_df = _cnt_wk_bwk_mth_combination(projects_df, 'school_city')
 
-    output_df = projects_df[['projectid', 'cnt_wk_schoolid', 'cnt_bwk_schoolid', 'cnt_mth_schoolid', 'cnt_wk_zip', 'cnt_bwk_zip', 'cnt_mth_zip', 'cnt_wk_city', 'cnt_bwk_city', 'cnt_mth_city']]
+    # compute average cost of all project (excluding optional supports) for each school city
+    tmp = projects_df.groupby('school_city')['total_price_excluding_optional_support'].agg(np.mean).to_frame(name='price_school_city')
+    tmp.reset_index(inplace=True)
+    projects_df = pd.merge(projects_df, tmp, how='left', on='school_city')
+
+    output_df = projects_df[['projectid', 'price_school_city', 'cnt_wk_schoolid', 'cnt_bwk_schoolid', 'cnt_mth_schoolid', 'cnt_wk_zip', 'cnt_bwk_zip', 'cnt_mth_zip', 'cnt_wk_city', 'cnt_bwk_city', 'cnt_mth_city']]
 
     output_df.to_csv(os.path.join('Features_csv', 'cnt_bw_wk_mth_combo.csv'), index=False)
 
