@@ -27,13 +27,14 @@ def _quantify(df, list_of_columns):
     return list_of_new_cols
 
 def _acc_cnt(df, list_of_vars, list_of_cnts, has_gapdays=True):
-    df['one'] = 1
     list_of_new_cols = []
     for var in list_of_vars:
         df_sorted = df.sort([var, 'date_posted'])
         df_sorted['date'] = pd.to_datetime(df_sorted['date_posted'], '%Y-%m-%d')
-        df_grouped = df.groupby(var)
+        df_sorted['one'] = 1
+        df_grouped = df_sorted.groupby(var)
 
+        # cumulative count for each var
         acc_cnt_col = var + '_cumcnt'
         df_sorted[acc_cnt_col] = df_grouped['one'].cumsum() - df_sorted['one']
         
@@ -63,7 +64,6 @@ def _acc_cnt(df, list_of_vars, list_of_cnts, has_gapdays=True):
             list_of_new_cols.append(gapdays_col)
             df[gapdays_col] = gapdays
             
-    del df['one']
     return list_of_new_cols
 
 if __name__ == '__main__':
