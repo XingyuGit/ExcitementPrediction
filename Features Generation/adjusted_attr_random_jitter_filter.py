@@ -13,6 +13,11 @@ sys.path.append('..')
 import import_data
 
 def _get_adjusted_attribute(df, y, condition, key1, key2=None, key3=None, percentage_all_exciting='percentage_exciting_all', k=5, r=0.5):
+    """
+        Take in account of exciting cnts, projects cnts,
+        total exciting percentages, and random jitter
+        for adjusted exciting value of attributes
+    """
     selected_attributes = [y, key1, percentage_all_exciting]
     group_attributes = [key1]
     if not key2 is None:
@@ -22,6 +27,7 @@ def _get_adjusted_attribute(df, y, condition, key1, key2=None, key3=None, percen
         selected_attributes.append(key3)
         group_attributes.append(key2)
 
+    # select attributes and do grouping
     df_selected = df[selected_attributes]
     df_filtered = df_selected.loc[np.logical_and(condition, np.logical_not(pd.isnull(df_selected['y']))), :]
     df_groups = df_filtered.groupby(group_attributes)
@@ -38,6 +44,7 @@ def _get_adjusted_attribute(df, y, condition, key1, key2=None, key3=None, percen
     df_selected.loc[pd.isnull(df_selected['projects_cnt']), 'projects_cnt'] = 0
     df_selected.loc[pd.isnull(df_selected['exciting_cnt']), 'exciting_cnt'] = 0
 
+    # Compute the adjusted value
     df_selected.loc[condition, 'projects_cnt'] -= 1
     df_selected.loc[condition, 'exciting_cnt'] -= df_selected.loc[condition, 'y']
     df_selected['expection_exciting'] = df_selected['projects_cnt'] / df_selected['exciting_cnt']
@@ -45,6 +52,7 @@ def _get_adjusted_attribute(df, y, condition, key1, key2=None, key3=None, percen
     df_selected.loc[pd.isnull(df_selected['expection_exciting']), 'expection_exciting'] = df_selected.loc[pd.isnull(df_selected['expection_exciting']), percentage_all_exciting]
     df_selected.loc[pd.isnull(df_selected['adjusted_y']), 'adjusted_y'] = df_selected.loc[pd.isnull(df_selected['adjusted_y']), percentage_all_exciting]
 
+    # apply random jitter for non-testing data
     random_numbers = [random.random() for x in range(np.sum(condition))]
     df_selected.loc[condition, 'adjusted_y'] *= [(x - 0.5) * r + 1 for x in random_numbers]
     return df_selected['adjusted_y']
