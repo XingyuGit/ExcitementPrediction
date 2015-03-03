@@ -19,25 +19,31 @@ def _timedelta(d):
 def _cnt_wk_bwk_mth_combination(df, key):
     print('Compute count for {} and date pair for a week, two weeks, and a month'.format(key))
 
+    # set attribute name keyword
     key_abbr = key
     if key == 'school_zip':
         key_abbr = 'zip'
     elif key == 'school_city':
         key_abbr = 'city'
 
+    # sum of project in the same date and same city/zip/school
     tmp = df.groupby(['date', key]).size().to_frame(name='cnt_day_{}'.format(key))
     tmp.reset_index(inplace=True)
     df = pd.merge(df, tmp, how= 'left', on=[key, 'date'])
 
+    # calculate date +1, ..., +6, -1, ..., -6
     for i in range(6):
         tmp.columns = ['date+{}'.format(i + 1), key, 'cnt_day_{}+{}'.format(key_abbr, i + 1)]
         df = pd.merge(df, tmp, how= 'left', on= [key, 'date+{}'.format(i + 1)])
-        df['cnt_day_{}+{}'.format(key_abbr, i + 1)][df['cnt_day_{}+{}'.format(key_abbr, i + 1)].apply(lambda c: pd.isnull(c))] = 0
+        filter = df['cnt_day_{}+{}'.format(key_abbr, i + 1)].apply(lambda c: pd.isnull(c))
+        df.loc[filter, 'cnt_day_{}+{}'.format(key_abbr, i + 1)] = 0
 
         tmp.columns = ['date-{}'.format(i + 1), key, 'cnt_day_{}-{}'.format(key_abbr, i + 1)]
         df = pd.merge(df, tmp, how= 'left', on= [key, 'date-{}'.format(i + 1)])
-        df['cnt_day_{}-{}'.format(key_abbr, i + 1)][df['cnt_day_{}-{}'.format(key_abbr, i + 1)].apply(lambda c: pd.isnull(c))] = 0
+        filter = df['cnt_day_{}-{}'.format(key_abbr, i + 1)].apply(lambda c: pd.isnull(c))
+        df.loc[filter, 'cnt_day_{}-{}'.format(key_abbr, i + 1)] = 0
 
+    # sum of project in the same month and same city
     tmp = df.groupby(['yearmonth', key]).size().to_frame(name='cnt_mth_{}'.format(key_abbr))
     tmp.reset_index(inplace=True)
     df = pd.merge(df, tmp, how='left', on=[key, 'yearmonth'])
@@ -87,7 +93,9 @@ if __name__ == '__main__':
 
     output_df = projects_df[['projectid', 'price_school_city', 'cnt_wk_schoolid', 'cnt_bwk_schoolid', 'cnt_mth_schoolid', 'cnt_wk_zip', 'cnt_bwk_zip', 'cnt_mth_zip', 'cnt_wk_city', 'cnt_bwk_city', 'cnt_mth_city']]
 
-    output_df.to_csv(os.path.join('Features_csv', 'cnt_bw_wk_mth_combo.csv'), index=False)
+    # wrtie to csv
+    print('writing to csv')
+    output_df.to_csv(os.path.join('../Features_csv', 'cnt_bw_wk_mth_combo.csv'), index=False)
 
 
 
