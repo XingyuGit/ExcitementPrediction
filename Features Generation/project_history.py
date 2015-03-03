@@ -26,18 +26,20 @@ def _quantify(df, list_of_columns):
         list_of_new_cols.append(new_col)
     return list_of_new_cols
 
-def _acc_cnt(df, list_of_vars, list_of_cnts):
+def _acc_cnt(df, list_of_vars, list_of_cnts, has_gapdays=True):
     df['one'] = 1
     list_of_new_cols = []
     for var in list_of_vars:
         df_sorted = df.sort([var, 'date_posted'])
+        df_sorted['date'] = pd.to_datetime(df_sorted['date_posted'], '%Y-%m-%d')
         df_grouped = df.groupby(var)
 
         acc_cnt_col = var + '_cumcnt'
         df_sorted[acc_cnt_col] = df_grouped['one'].cumsum() - df_sorted['one']
-        df[acc_cnt_col] = df_sorted[acc_cnt_col].sort_index()
-        # add to new column list
+        
+        # add new column
         list_of_new_cols.append(acc_cnt_col)
+        df[acc_cnt_col] = df_sorted[acc_cnt_col].sort_index()
 
         for cnt_col in list_of_cnts:
             cumsum_col = var + '_' + cnt_col.replace('cnt', 'cumcnt')
@@ -45,11 +47,22 @@ def _acc_cnt(df, list_of_vars, list_of_cnts):
             df_prev_cumsum = df_grouped[cnt_col].cumsum() - df_sorted[cnt_col]
             df_prev_rate = df_prev_cumsum / df_sorted[acc_cnt_col]
             df_prev_rate[np.isinf(df_prev_rate)] = 0
-            df[cumsum_col] = df_prev_cumsum.sort_index()
-            df[rate_col] = df_prev_rate.sort_index()
-            # add to new column list
+            
+            # add new columns
             list_of_new_cols.append(cumsum_col)
             list_of_new_cols.append(rate_col)
+            df[cumsum_col] = df_prev_cumsum.sort_index()
+            df[rate_col] = df_prev_rate.sort_index()
+
+        if has_gapdays:
+            gapdays_col = var + '_gapdays'
+            gapdays = df_grouped['date'].diff()/ pd.offsets.Day(1)
+            gapdays.fillna(9999, inplace=True)
+
+            # add new column
+            list_of_new_cols.append(gapdays_col)
+            df[gapdays_col] = gapdays
+            
     del df['one']
     return list_of_new_cols
 
