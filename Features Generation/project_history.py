@@ -113,7 +113,7 @@ def _acc_cnt(df, list_of_vars, list_of_cnts, has_gapdays=True):
 
 def _select(in_file, out_file, list_of_columns):
     df = pd.read_csv(in_file)
-    return df.to_csv(out_file, columns=list_of_columns)
+    return df.to_csv(out_file, columns=list_of_columns, index=False)
 
 if __name__ == '__main__':
     # if path is not specified, default is 'Data'
