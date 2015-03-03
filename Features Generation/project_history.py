@@ -115,15 +115,7 @@ def _select(in_file, out_file, list_of_columns):
     df = pd.read_csv(in_file)
     return df.to_csv(out_file, columns=list_of_columns, index=False)
 
-if __name__ == '__main__':
-    # if path is not specified, default is 'Data'
-    path = sys.argv[1] if len(sys.argv) > 1 else '../Data'
-    # processing the whole file or refinement
-    bnew = sys.argv[2] == 'new' if len(sys.argv) > 2 else False
-    
-    whole_filepath = os.path.join('../Features_csv', 'project_history.csv')
-    refine_filepath = os.path.join('../Features_csv', 'refined_project_history.csv')
-
+def _list_of_columns():
     list_of_columns = ['projectid', 'teacher_acctid_gapdays', 'schoolid_gapdays', 'teacher_acctid_cumcnt',
     'schoolid_cumcnt', 'teacher_acctid_is_exciting_cumcredrate', 'schoolid_is_exciting_cumcredrate_cap',
     'school_district_is_exciting_cumrate', 'school_county_is_exciting_cumrate',
@@ -135,11 +127,21 @@ if __name__ == '__main__':
     'schoolid_cumcnt', 'teacher_acctid_cumcnt', 'schoolid_is_teacher_acct_cumrate',
     'teacher_acctid_is_teacher_acct_cumrate', 'schoolid_donation_total_cumcnt',
     'teacher_acctid_donation_total_cumcnt']
+    return list_of_columns
+
+if __name__ == '__main__':
+    # if path is not specified, default is 'Data'
+    path = sys.argv[1] if len(sys.argv) > 1 else '../Data'
+    # processing the whole file or refinement
+    bnew = sys.argv[2] == 'new' if len(sys.argv) > 2 else False
+    
+    whole_filepath = os.path.join('../Features_csv', 'project_history.csv')
+    refine_filepath = os.path.join('../Features_csv', 'refined_project_history.csv')
 
     if ~bnew and os.path.isfile(whole_filepath):
         print 'input from: ' + whole_filepath
         print 'output to: ' + refine_filepath
-        _select(whole_filepath, refine_filepath, list_of_columns)
+        _select(whole_filepath, refine_filepath, _list_of_columns())
         sys.exit()
 
     # list_to_write: list of columns that will write to files
@@ -187,14 +189,14 @@ if __name__ == '__main__':
     list_to_write += list_of_new_cols
 
     # write to csv
-    print 'write to file: ' + 'project_history.csv';
+    print 'write to file: ' + whole_filepath + ' ...';
     df = pd.merge(df, df2)
-    df[list_to_write].to_csv(output_file, index=False)
+    df[list_to_write].to_csv(whole_filepath, index=False)
 
     # refinement
-    print 'input from: ' + whole_filepath
-    print 'output to: ' + refine_filepath
-    _select(whole_filepath, refine_filepath, list_of_columns)
+    print 'read from: ' + whole_filepath
+    print 'write to: ' + refine_filepath
+    _select(whole_filepath, refine_filepath, _list_of_columns())
     
 
 
