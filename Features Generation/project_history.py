@@ -118,8 +118,11 @@ def _select(in_file, out_file, list_of_columns):
 if __name__ == '__main__':
     # if path is not specified, default is 'Data'
     path = sys.argv[1] if len(sys.argv) > 1 else '../Data'
+    # processing the whole file or refinement
     bnew = sys.argv[2] == 'new' if len(sys.argv) > 2 else False
-    print bnew
+    
+    whole_filepath = os.path.join('../Features_csv', 'project_history.csv')
+    refine_filepath = os.path.join('../Features_csv', 'refined_project_history.csv')
 
     list_of_columns = ['projectid', 'teacher_acctid_gapdays', 'schoolid_gapdays', 'teacher_acctid_cumcnt',
     'schoolid_cumcnt', 'teacher_acctid_is_exciting_cumcredrate', 'schoolid_is_exciting_cumcredrate_cap',
@@ -133,12 +136,10 @@ if __name__ == '__main__':
     'teacher_acctid_is_teacher_acct_cumrate', 'schoolid_donation_total_cumcnt',
     'teacher_acctid_donation_total_cumcnt']
 
-    if ~bnew:
-        input_file = os.path.join('../Features_csv', 'project_history.csv')
-        output_file = os.path.join('../Features_csv', 'refined_project_history.csv')
-        print 'input from: ' + input_file
-        print 'output to: ' + output_file
-        _select(input_file, output_file, list_of_columns)
+    if ~bnew and os.path.isfile(whole_filepath):
+        print 'input from: ' + whole_filepath
+        print 'output to: ' + refine_filepath
+        _select(whole_filepath, refine_filepath, list_of_columns)
         sys.exit()
 
     # list_to_write: list of columns that will write to files
@@ -191,11 +192,9 @@ if __name__ == '__main__':
     df[list_to_write].to_csv(output_file, index=False)
 
     # refinement
-    input_file = os.path.join('../Features_csv', 'project_history.csv')
-    output_file = os.path.join('../Features_csv', 'refined_project_history.csv')
-    print 'input from: ' + input_file
-    print 'output to: ' + output_file
-    _select(input_file, output_file, list_of_columns)
+    print 'input from: ' + whole_filepath
+    print 'output to: ' + refine_filepath
+    _select(whole_filepath, refine_filepath, list_of_columns)
     
 
 
