@@ -46,7 +46,7 @@ def _get_adjusted_attribute(df, y, condition, key1, key2=None, key3=None, percen
     df_selected.loc[pd.isnull(df_selected['adjusted_y']), 'adjusted_y'] = df_selected.loc[pd.isnull(df_selected['adjusted_y']), percentage_all_exciting]
 
     random_numbers = [random.random() for x in range(np.sum(condition))]
-    df_selected.loc[condition, 'adjusted_y'] *= (random_numbers - 0.5) * r + 1
+    df_selected.loc[condition, 'adjusted_y'] *= [(x - 0.5) * r + 1 for x in random_numbers]
     return df_selected['adjusted_y']
 
 if __name__ == '__main__':
