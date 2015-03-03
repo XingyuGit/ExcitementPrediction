@@ -12,7 +12,7 @@ def get_outcomes_df(path):
     fn = 'outcomes.csv'
     outcomes_df = __read_file(path, fn)
     outcomes_df['y'] = 0
-    outcomes_df['y'][outcomes_df['is_exciting'] == 't'] = 1
+    outcomes_df.loc[outcomes_df['is_exciting'] == 't', 'y'] = 1
     return outcomes_df
 
 
@@ -24,9 +24,9 @@ def get_projects_df(path):
     # for optimization, use validation data to optimize performance
     # for prediction, using testing data (after 2014-4-1)
     projects_df['group'] = 'train'
-    projects_df['group'][projects_df['date_posted'] < '2010-04-01'] = 'none'
-    projects_df['group'][projects_df['date_posted'] >= '2013-01-01'] = 'valid'
-    projects_df['group'][projects_df['date_posted'] >= '2014-01-01'] = 'test'
+    projects_df.loc[projects_df['date_posted'] < '2010-04-01', 'group'] = 'none'
+    projects_df.loc[projects_df['date_posted'] >= '2013-01-01', 'group'] = 'valid'
+    projects_df.loc[projects_df['date_posted'] >= '2014-01-01', 'group'] = 'test'
     return projects_df
 
 
