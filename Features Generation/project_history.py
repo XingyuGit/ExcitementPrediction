@@ -112,21 +112,22 @@ def _acc_cnt(df, list_of_vars, list_of_cnts, has_gapdays=True):
     return list_of_new_cols
 
 def _select(in_file, out_file, list_of_columns):
+    print 'input from: ' + in_file + " ..."
     df = pd.read_csv(in_file)
+    print 'output to: ' + out_file + " ..."
     return df.to_csv(out_file, columns=list_of_columns, index=False)
 
 def _list_of_columns():
-    list_of_columns = ['projectid', 'teacher_acctid_gapdays', 'schoolid_gapdays', 'teacher_acctid_cumcnt',
-    'schoolid_cumcnt', 'teacher_acctid_is_exciting_cumcredrate', 'schoolid_is_exciting_cumcredrate_cap',
-    'school_district_is_exciting_cumrate', 'school_county_is_exciting_cumrate',
-    'schoolid_at_least_1_teacher_referred_donor_cumrate',
-    'teacher_acctid_at_least_1_teacher_referred_donor_cumrate',
-    'schoolid_fully_funded_cumrate', 'teacher_acctid_fully_funded_cumrate',
-    'school_district_fully_funded_cumrate', 'schoolid_at_least_1_green_donation_cumrate',
-    'schoolid_great_chat_cumrate', 'teacher_acctid_great_chat_cumrate',
-    'schoolid_cumcnt', 'teacher_acctid_cumcnt', 'schoolid_is_teacher_acct_cumrate',
-    'teacher_acctid_is_teacher_acct_cumrate', 'schoolid_donation_total_cumcnt',
-    'teacher_acctid_donation_total_cumcnt']
+    list_of_columns = ['projectid', 'group', 'y', 'teacher_acctid_gapdays', 'schoolid_gapdays', 
+    'teacher_acctid_cumcnt', 'schoolid_cumcnt', 'teacher_acctid_is_exciting_cumcredrate', 
+    'schoolid_is_exciting_cumcredrate_cap', 'school_district_is_exciting_cumrate', 
+    'school_county_is_exciting_cumrate', 'schoolid_at_least_1_teacher_referred_donor_cumrate',
+    'teacher_acctid_at_least_1_teacher_referred_donor_cumrate', 'schoolid_fully_funded_cumrate', 
+    'teacher_acctid_fully_funded_cumrate', 'school_district_fully_funded_cumrate', 
+    'schoolid_at_least_1_green_donation_cumrate', 'schoolid_great_chat_cumrate', 
+    'teacher_acctid_great_chat_cumrate', 'schoolid_cumcnt', 'teacher_acctid_cumcnt', 
+    'schoolid_is_teacher_acct_cumrate', 'teacher_acctid_is_teacher_acct_cumrate', 
+    'schoolid_donation_total_cumcnt', 'teacher_acctid_donation_total_cumcnt']
     return list_of_columns
 
 if __name__ == '__main__':
@@ -139,8 +140,6 @@ if __name__ == '__main__':
     refine_filepath = os.path.join('../Features_csv', 'refined_project_history.csv')
 
     if ~bnew and os.path.isfile(whole_filepath):
-        print 'input from: ' + whole_filepath
-        print 'output to: ' + refine_filepath
         _select(whole_filepath, refine_filepath, _list_of_columns())
         sys.exit()
 
@@ -189,14 +188,13 @@ if __name__ == '__main__':
     list_to_write += list_of_new_cols
 
     # write to csv
-    print 'write to file: ' + whole_filepath + ' ...';
+    print 'write the whole to file: ' + whole_filepath + ' ...';
     df = pd.merge(df, df2)
     df[list_to_write].to_csv(whole_filepath, index=False)
 
     # refinement
-    print 'read from: ' + whole_filepath
-    print 'write to: ' + refine_filepath
-    _select(whole_filepath, refine_filepath, _list_of_columns())
+    print 'write the refined to file: ' + refine_filepath + ' ...';
+    df[_list_of_columns()].to_csv(refine_filepath, index=False)
     
 
 
