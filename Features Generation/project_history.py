@@ -101,7 +101,7 @@ def _acc_cnt(df, list_of_vars, list_of_cnts, has_gapdays=True):
         # gapdays
         if has_gapdays:
             gapdays_col = var + '_gapdays'
-            gapdays = df_grouped['date'].diff()/ pd.offsets.Day(1)
+            gapdays = df_grouped['date'].diff() / pd.offsets.Day(1)
             gapdays.fillna(9999, inplace=True)
 
             # add new columns name to list
@@ -140,6 +140,7 @@ if __name__ == '__main__':
     refine_filepath = os.path.join('../Features_csv', 'refined_project_history.csv')
 
     if ~bnew and os.path.isfile(whole_filepath):
+        print "reuse existing whole stat..."
         _select(whole_filepath, refine_filepath, _list_of_columns())
         sys.exit()
 
