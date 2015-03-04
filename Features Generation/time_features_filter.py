@@ -35,12 +35,12 @@ def _cnt_wk_bwk_mth_combination(df, key):
     for i in range(6):
         tmp.columns = ['date+{}'.format(i + 1), key, 'cnt_day_{}+{}'.format(key_abbr, i + 1)]
         df = pd.merge(df, tmp, how= 'left', on= [key, 'date+{}'.format(i + 1)])
-        filter = df['cnt_day_{}+{}'.format(key_abbr, i + 1)].apply(lambda c: pd.isnull(c))
+        filter = pd.isnull(df['cnt_day_{}+{}'.format(key_abbr, i + 1)])
         df.loc[filter, 'cnt_day_{}+{}'.format(key_abbr, i + 1)] = 0
 
         tmp.columns = ['date-{}'.format(i + 1), key, 'cnt_day_{}-{}'.format(key_abbr, i + 1)]
         df = pd.merge(df, tmp, how= 'left', on= [key, 'date-{}'.format(i + 1)])
-        filter = df['cnt_day_{}-{}'.format(key_abbr, i + 1)].apply(lambda c: pd.isnull(c))
+        filter = pd.isnull(['cnt_day_{}-{}'.format(key_abbr, i + 1)])
         df.loc[filter, 'cnt_day_{}-{}'.format(key_abbr, i + 1)] = 0
 
     # sum of project in the same month and same city
@@ -63,6 +63,8 @@ def _cnt_wk_bwk_mth_combination(df, key):
 
     return df
 
+def _columns_to_write():
+    return ['projectid', 'price_school_city', 'cnt_wk_schoolid', 'cnt_bwk_schoolid', 'cnt_mth_schoolid', 'cnt_wk_zip', 'cnt_bwk_zip', 'cnt_mth_zip', 'cnt_wk_city', 'cnt_bwk_city', 'cnt_mth_city']
 
 
 if __name__ == '__main__':
@@ -73,8 +75,8 @@ if __name__ == '__main__':
 
     # delta of date
     date_delta = [_timedelta(1), _timedelta(2), _timedelta(3), _timedelta(4), _timedelta(5), _timedelta(6)]
-    projects_df['date'] = projects_df['date_posted'].apply(lambda d: datetime.datetime.strptime(d, '%Y-%m-%d') if not pd.isnull(d) else d)
-    projects_df['yearmonth'] = projects_df['date_posted'].apply(lambda d: datetime.datetime.strptime(d[:7], '%Y-%m') if not pd.isnull(d) else d)
+    projects_df['date'] = pd.to_datetime(projects_df['date_posted'], '%Y-%m-%d')
+    projects_df['yearmonth'] = pd.to_datetime(projects_df['date_posted'].str[:7], '%Y-%m')
 
     # introduce columns of dates from current_date + 6 to current_date - 6
     for i in range(6):
@@ -91,7 +93,7 @@ if __name__ == '__main__':
     tmp.reset_index(inplace=True)
     projects_df = pd.merge(projects_df, tmp, how='left', on='school_city')
 
-    output_df = projects_df[['projectid', 'price_school_city', 'cnt_wk_schoolid', 'cnt_bwk_schoolid', 'cnt_mth_schoolid', 'cnt_wk_zip', 'cnt_bwk_zip', 'cnt_mth_zip', 'cnt_wk_city', 'cnt_bwk_city', 'cnt_mth_city']]
+    output_df = projects_df[_columns_to_write()]
 
     # wrtie to csv
     print('writing to csv')
