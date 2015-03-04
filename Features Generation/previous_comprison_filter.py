@@ -1,17 +1,17 @@
 __author__ = 'TerryChen'
 
 #
-#   Features # 31, 32, 33, 25, 26
+# Features # 31, 32, 33, 25, 26
 #
 
 
 import sys
 import os
 import pandas as pd
-import datetime
 import numpy as np
 sys.path.append('..')
 import import_data
+
 
 def _set_shift(df, key, key_shift):
     # using shift to group by key
@@ -22,6 +22,7 @@ def _set_shift(df, key, key_shift):
     df.loc[df[key_shift] == df[key], 'shift'] = 1
     return df
 
+
 def _get_days_since_prev(df, key):
     # get delta day within group 'key' (sorted by date and key)
     arr = df['date'][:len(df) - 1].values
@@ -30,10 +31,11 @@ def _get_days_since_prev(df, key):
 
     df.loc[df['shift'] != 1, 'date_prev'] = np.nan
     date_object_delta = df['date'] - df['date_prev']
-    df['days_since_prev_{}_v2'.format(key)] = date_object_delta.apply(lambda d: d / np.timedelta64(1, 'D') if not pd.isnull(d) else d)
+    df['days_since_prev_{}_v2'.format(key)] = date_object_delta / np.timedelta64(1, 'D')
     df.loc[pd.isnull(df['days_since_prev_{}_v2'.format(key)]), 'days_since_prev_{}_v2'.format(key)] = 1
 
     return df
+
 
 def _get_prev_price(df):
     # get previous date project cost within group (sorted by date and key)
@@ -44,13 +46,20 @@ def _get_prev_price(df):
 
     return df
 
+
+def _columns_to_write():
+    return ['projectid', 'days_since_prev_schoolid_v2', 'i_price_prev_dif_schoolid_v2',
+            'days_since_prev_school_city_v2', 'i_price_school_city_cummax_v2', 'i_price_dec_over_min_school_zip_v2']
+
+
 if __name__ == '__main__':
     # if path is not specified, default is 'Data'
     path = sys.argv[1] if len(sys.argv) > 1 else '../Data'
     projects_df = import_data.get_projects_df(path)
-    projects_df = projects_df[['projectid', 'date_posted', 'schoolid', 'school_city', 'school_zip', 'total_price_including_optional_support']]
+    projects_df = projects_df[
+        ['projectid', 'date_posted', 'schoolid', 'school_city', 'school_zip', 'total_price_including_optional_support']]
 
-    projects_df['date'] = projects_df['date_posted'].apply(lambda d: datetime.datetime.strptime(d, '%Y-%m-%d') if not pd.isnull(d) else d)
+    projects_df['date'] = pd.to_datetime(projects_df['date_posted'], '%Y-%m-%d')
 
     df1 = projects_df.sort(['schoolid', 'date'], ascending=[1, 1])
     df1 = _set_shift(df1, 'schoolid', 'school_shift')
@@ -65,7 +74,7 @@ if __name__ == '__main__':
 
     df1 = df1[['projectid', 'days_since_prev_schoolid_v2', 'i_price_prev_dif_schoolid_v2']]
 
-    df2 = projects_df.sort(['school_city', 'date'], ascending=[1,1])
+    df2 = projects_df.sort(['school_city', 'date'], ascending=[1, 1])
     df2 = _set_shift(df2, 'school_city', 'city_shift')
 
     # how many days between the project at date(i) and project at date(i-1) at the same school city
@@ -96,10 +105,12 @@ if __name__ == '__main__':
     projects_df = pd.merge(projects_df, df2, how='left', on='projectid')
     projects_df = pd.merge(projects_df, df3, how='left', on='projectid')
 
-    projects_df['i_price_dec_over_min_school_zip_v2'] = projects_df['i_price_school_zip_cummin'] - projects_df['total_price_including_optional_support']
-    projects_df.loc[pd.isnull(projects_df['i_price_dec_over_min_school_zip_v2']), 'i_price_dec_over_min_school_zip_v2'] = 0
+    projects_df['i_price_dec_over_min_school_zip_v2'] = projects_df['i_price_school_zip_cummin'] - projects_df[
+        'total_price_including_optional_support']
+    projects_df.loc[
+        pd.isnull(projects_df['i_price_dec_over_min_school_zip_v2']), 'i_price_dec_over_min_school_zip_v2'] = 0
 
-    outputs_df = projects_df[['projectid', 'days_since_prev_schoolid_v2', 'i_price_prev_dif_schoolid_v2', 'days_since_prev_school_city_v2', 'i_price_school_city_cummax_v2', 'i_price_dec_over_min_school_zip_v2']]
+    outputs_df = projects_df[_columns_to_write()]
 
     # write to csv
     print('writing to csv')
