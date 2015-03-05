@@ -62,8 +62,8 @@ def _get_adjusted_attribute(df, y, condition, key1, key2=None, key3=None,
 
 
 def _columns_to_write():
-    return ['projectid', 'adj_teacher_acctid', 'adj_schoolid', 'adj_school_state', 'adj_subject',
-            'adj_primary_focus_subject_resource_type', 'adj_secondary_focus_subject_resource_type']
+    return ['projectid', 'teacher_acctid_is_exciting_adj_rate', 'schoolid_is_exciting_adj_rate', 'school_state_is_exciting_adj_rate', 'adj_subject',
+            'primary_subj_resource_type_is_adj_rate', 'secondary_subj_resource_type_is_adj_rate']
 
 
 if __name__ == '__main__':
@@ -87,17 +87,17 @@ if __name__ == '__main__':
 
     # set seed to current system time
     np.random.seed()
-    data_df['adj_teacher_acctid'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'teacher_acctid',
+    data_df['teacher_acctid_is_exciting_adj_rate'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'teacher_acctid',
                                                             k=5, r=0.3)
-    data_df['adj_schoolid'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'schoolid', k=25, r=0.3)
-    data_df['adj_school_state'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'school_state', k=25,
+    data_df['schoolid_is_exciting_adj_rate'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'schoolid', k=25, r=0.3)
+    data_df['school_state_is_exciting_adj_rate'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'school_state', k=25,
                                                           r=0.3)
     data_df['adj_subject'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'primary_focus_subject',
                                                      key2='secondary_focus_subject', k=20, r=0.3)
-    data_df['adj_primary_focus_subject_resource_type'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1,
+    data_df['primary_subj_resource_type_is_adj_rate'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1,
                                                                                  'primary_focus_subject',
                                                                                  key2='resource_type', k=25, r=0.3)
-    data_df['adj_secondary_focus_subject_resource_type'] = _get_adjusted_attribute(data_df, 'y',
+    data_df['secondary_subj_resource_type_is_adj_rate'] = _get_adjusted_attribute(data_df, 'y',
                                                                                    data_df['non_test'] == 1,
                                                                                    'secondary_focus_subject',
                                                                                    key2='resource_type', k=25, r=0.3)
