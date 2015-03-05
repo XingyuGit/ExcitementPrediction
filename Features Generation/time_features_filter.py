@@ -40,7 +40,7 @@ def _cnt_wk_bwk_mth_combination(df, key):
 
         tmp.columns = ['date-{}'.format(i + 1), key, 'cnt_day_{}-{}'.format(key_abbr, i + 1)]
         df = pd.merge(df, tmp, how= 'left', on= [key, 'date-{}'.format(i + 1)])
-        filter = pd.isnull(['cnt_day_{}-{}'.format(key_abbr, i + 1)])
+        filter = pd.isnull(df['cnt_day_{}-{}'.format(key_abbr, i + 1)])
         df.loc[filter, 'cnt_day_{}-{}'.format(key_abbr, i + 1)] = 0
 
     # sum of project in the same month and same city
@@ -99,7 +99,16 @@ if __name__ == '__main__':
     print('writing to csv')
     output_df.to_csv(os.path.join('../Features_csv', 'cnt_bw_wk_mth_combo.csv'), index=False)
 
+    """
+    self correctness validation
+    columns_to_test = _columns_to_write()
+    columns_to_test.append('date_posted')
+    columns_to_test.append('schoolid')
+    columns_to_test.append('school_city')
+    columns_to_test.append('school_zip')
+    test_df = projects_df[columns_to_test]
+    test_df.sort(['schoolid', 'date_posted'], ascending=[1,1])[:50000].to_csv(os.path.join('../FeaturesValidations', 'cnt_bw_wk_mth_school.csv'))
+    test_df.sort(['school_zip', 'date_posted'], ascending=[1,1])[:50000].to_csv(os.path.join('../FeaturesValidations', 'cnt_bw_wk_mth_zip.csv'))
+    test_df.sort(['school_city', 'date_posted'], ascending=[1,1])[:50000].to_csv(os.path.join('../FeaturesValidations', 'cnt_bw_wk_mth_city.csv'))
 
-
-
-
+    """

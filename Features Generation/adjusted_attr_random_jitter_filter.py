@@ -107,3 +107,8 @@ if __name__ == '__main__':
     # wrtie to csv
     print('writing to csv')
     data_df.to_csv(os.path.join('../Features_csv', 'adjusted_attributes.csv'), index=False)
+
+    """
+    self correctness validation
+    data_df[:50000].to_csv(os.path.join('../FeaturesValidations', 'adjusted_attributes.csv'), index=False)
+    """
