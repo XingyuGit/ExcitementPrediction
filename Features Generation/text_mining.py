@@ -31,21 +31,23 @@ def get_predications(df, idf, train_set, test_set,target_values):
 	"""
 	m_train = idf.transform(train_set)
 	m_test=idf.transform(test_set)
-	# print m_train
-	# print target_values
 	lm = SGDClassifier(penalty="l2",loss="log",fit_intercept=True, shuffle=True,n_iter=20, n_jobs=-1,alpha=0.000005)
 	lm.fit(m_train, target_values)
 	return lm.predict_proba(m_test)[:,1]
 
-def get_length(df, list_of_text_vars):
+def get_text_info(df, list_of_text_vars):
 	"""
 	replace anomalious character and get the length for each variable
 	"""
 	for var in list_of_text_vars:
 		df.loc[pd.isnull(df[var]), var] = ""
 		df[var]=df[var].apply(lambda x:re.sub("\t|\n|\r|\W|\s{2,}|[^A-Za-z0-9\']", " ", x)) 
-		df[var+"_length"] = df[var].apply(lambda x:len(x.split()))  
-
+		df[var+"_length"] = df[var].apply(lambda x:len(x.split()))
+		df[var+"_tot_len"]=df[var].apply(lambda x:len(x))
+		df[var+"_lett_len"]=df[var+"_tot_len"]-df[var+"_length"]+1
+		df[var+"_cap"]=df[var].apply(lambda x:re.sub("[^A-Z]","", x))
+		df[var+"_cap_len"]=df[var+"_cap"].apply(lambda x:len(x))  
+		df[var+"_cap_per"]=df[var+"_cap_len"]/df[var+"_lett_len"]
 if __name__ == '__main__':
 	# if path is not specified, default is 'Data'
 	path = sys.argv[1] if len(sys.argv) > 1 else '../Data'
@@ -60,7 +62,7 @@ if __name__ == '__main__':
 	df["y"] = 0
 	df["y"][df["is_exciting"]=="t"] = 1
 	list_of_text_vars=["title", "short_description", "need_statement", "essay"]
-	get_length(df, list_of_text_vars)
+	get_text_info(df, list_of_text_vars)
 	#store a random number between 0 and 1 for each row
 	df["r"] = np.random.uniform(0,1,size=len(df))
 	for var in list_of_text_vars:
@@ -70,8 +72,10 @@ if __name__ == '__main__':
 		idf=get_idf(df, var)
 		df[var+"_pred"]=get_predications(df, idf, df[var][df["group"]=="train"], df[var], df["y"][df["group"]=="train"].values)	
 		cross_validate(df, var, idf, seg_name)
-	to_write_list_1=["projectid","essay_pred","essay_pred_segmental","essay_length","title_pred","title_pred_segmental","title_length"]
-	to_write_list_2=["projectid","short_description_pred","short_description_pred_segmental","need_statement_pred","need_statement_pred_segmental"]
+	to_write_list_1=["projectid","essay_pred","essay_pred_segmental","essay_length","essay_cap_len", "essay_cap_per",
+					"title_pred","title_pred_segmental","title_length","title_cap_len","title_cap_per"]
+	to_write_list_2=["projectid","short_description_pred","short_description_pred_segmental","short_description_length","short_description_cap_len","short_description_cap_per",
+					"need_statement_pred","need_statement_pred_segmental","need_statement_length","need_statement_cap_len","need_statement_cap_per"]
 	df[to_write_list_1].to_csv(filepath_1, index=False)
 	df[to_write_list_2].to_csv(filepath_2, index=False)
 	del df
