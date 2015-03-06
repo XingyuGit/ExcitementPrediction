@@ -47,7 +47,7 @@ def get_text_info(df, list_of_text_vars):
 		df[var+"_lett_len"]=df[var+"_tot_len"]-df[var+"_length"]+1
 		df[var+"_cap"]=df[var].apply(lambda x:re.sub("[^A-Z]","", x))
 		df[var+"_cap_len"]=df[var+"_cap"].apply(lambda x:len(x))  
-		df[var+"_cap_per"]=df[var+"_cap_len"]/df[var+"_lett_len"]
+		df[var+"_cap_per"]=df[var+"_cap_len"]/df[var+"_lett_len"]	
 if __name__ == '__main__':
 	# if path is not specified, default is 'Data'
 	path = sys.argv[1] if len(sys.argv) > 1 else '../Data'
@@ -76,6 +76,6 @@ if __name__ == '__main__':
 					"title_pred","title_pred_segmental","title_length","title_cap_len","title_cap_per"]
 	to_write_list_2=["projectid","short_description_pred","short_description_pred_segmental","short_description_length","short_description_cap_len","short_description_cap_per",
 					"need_statement_pred","need_statement_pred_segmental","need_statement_length","need_statement_cap_len","need_statement_cap_per"]
-	df[to_write_list_1].to_csv(filepath_1, index=False)
-	df[to_write_list_2].to_csv(filepath_2, index=False)
+	df[to_write_list_1][df["group"]!="none"].to_csv(filepath_1, index=False)
+	df[to_write_list_2][df["group"]!="none"].to_csv(filepath_2, index=False)
 	del df
