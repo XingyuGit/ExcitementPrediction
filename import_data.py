@@ -24,9 +24,9 @@ def get_projects_df(path):
     # for optimization, use validation data to optimize performance
     # for prediction, using testing data (after 2014-4-1)
     projects_df['group'] = 'train'
-    projects_df.loc[projects_df['date_posted'] < '2010-04-01', 'group'] = 'none'
     projects_df.loc[projects_df['date_posted'] >= '2013-01-01', 'group'] = 'valid'
     projects_df.loc[projects_df['date_posted'] >= '2014-01-01', 'group'] = 'test'
+    projects_df = projects_df[projects_df['date_posted'] >= '2010-04-01']
     return projects_df
 
 def get_donations_df(path):
