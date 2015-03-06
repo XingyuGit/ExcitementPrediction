@@ -136,8 +136,8 @@ if __name__ == '__main__':
     # processing the whole file or refinement
     bnew = sys.argv[2] == 'new' if len(sys.argv) > 2 else False
     
-    whole_filepath = os.path.join('../Features_csv', 'project_history.csv')
-    refine_filepath = os.path.join('../Features_csv', 'refined_project_history.csv')
+    whole_filepath = os.path.join('../Features_csv', 'history_stat.csv')
+    refine_filepath = os.path.join('../Features_csv', 'refined_history_stat.csv')
 
     if ~bnew and os.path.isfile(whole_filepath):
         print "reuse existing whole stat..."
