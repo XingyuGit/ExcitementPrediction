@@ -47,7 +47,10 @@ def get_text_info(df, list_of_text_vars):
 		df[var+"_lett_len"]=df[var+"_tot_len"]-df[var+"_length"]+1
 		df[var+"_cap"]=df[var].apply(lambda x:re.sub("[^A-Z]","", x))
 		df[var+"_cap_len"]=df[var+"_cap"].apply(lambda x:len(x))  
-		df[var+"_cap_per"]=df[var+"_cap_len"]/df[var+"_lett_len"]	
+		df[var+"_cap_per"]=df[var+"_cap_len"]/df[var+"_lett_len"]
+		del df[var+"_tot_len"]
+		del df[var+"_lett_len"]
+		del df[var+"_cap"]		
 if __name__ == '__main__':
 	# if path is not specified, default is 'Data'
 	path = sys.argv[1] if len(sys.argv) > 1 else '../Data'
