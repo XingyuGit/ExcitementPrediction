@@ -4,8 +4,10 @@
 !.gitignore
 !adjusted_attributes.csv
 !cnt_bw_wk_mth_combo.csv
+!refined_history_stat.csv
+!adjusted_attributes.csv
+!cnt_bw_wk_mth_combo.csv
 !essay_pred_val_1.csv
-!essay_pred_val_2.csv
 !exciting_project_rolling_average.csv
 !project_eligibility_orgin.csv
 !resource_cnt.csv
