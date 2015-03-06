@@ -53,13 +53,13 @@ if __name__ == '__main__':
     resource_df['item_price_total'] = resource_df['item_unit_price']*resource_df['item_quantity']	
     tmp = resource_df.groupby('projectid')['item_price_total'].agg(np.sum).to_frame(name='item_amount_total_per_project')							
     tmp.reset_index(inplace=True)
-    projects_df = pd.merge(projects_df,tmp,how='left',on='projectid')
+    projects_df = pd.merge(projects_df, tmp, how='left', on='projectid')
     projects_df.loc[pd.isnull(projects_df['item_amount_total_per_project']), 'item_amount_total_per_project'] = 0
 
 # feature 53: 'agg_cnt'-- number of resources a project needs
     tmp1 = resource_df.groupby('projectid').size().to_frame(name='resource_total_per_project')
     tmp1.reset_index(inplace=True)
-    projects_df = pd.merge(projects_df,tmp1,how='left',on='projectid')
+    projects_df = pd.merge(projects_df, tmp1, how='left', on='projectid')
     projects_df.loc[pd.isnull(projects_df['resource_total_per_project']), 'resource_total_per_project'] = 0
     
 # feature 54-57   
@@ -78,8 +78,11 @@ if __name__ == '__main__':
     outcome_df = projects_df[projects_df['group'] != 'none']
     
     print('writing to csv')
-    outcome_df[project_features_to_write].to_csv(os.path.join('../Features_csv', 'project_eligibility_orgin.csv'))
-    outcome_df[resource_features_to_write].to_csv(os.path.join('../Features_csv', 'resource_cnt.csv'))
-    
+    outcome_df[project_features_to_write].to_csv(os.path.join('../Features_csv', 'project_eligibility_orgin.csv'), index=False)
+    outcome_df[resource_features_to_write].to_csv(os.path.join('../Features_csv', 'resource_cnt.csv'), index=False)
+
+    """
+    # correctness validation
     outcome_df[project_features_to_write][:10000].to_csv(os.path.join('../Features_csv', 'project_eligibility_orgin_test.csv'))
     outcome_df[resource_features_to_write][:10000].to_csv(os.path.join('../Features_csv', 'resource_cnt_test.csv'))
+    """
