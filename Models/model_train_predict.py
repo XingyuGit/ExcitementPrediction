@@ -74,7 +74,7 @@ class train_mode:
 
         #   predict and convert to dataframe for writing
         y_test_matrix = clf.predict(x_test_matrix)
-        y_test_df = pd.DataFrame(y_test_matrix, columns='y')
+        y_test_df = pd.DataFrame(y_test_matrix, columns='{}_y'.format(output_fn[:-4]))
 
         # write to file
         print('writing file: ' + output_fn)
