@@ -19,26 +19,32 @@ def _timedelta(d):
 def _cnt_wk_bwk_mth_combination(df, key):
     print('Compute count for {} and date pair for a week, two weeks, and a month'.format(key))
 
+    # set attribute name keyword
     key_abbr = key
     if key == 'school_zip':
         key_abbr = 'zip'
     elif key == 'school_city':
         key_abbr = 'city'
 
+    # sum of project in the same date and same city/zip/school
     tmp = df.groupby(['date', key]).size().to_frame(name='cnt_day_{}'.format(key))
     tmp.reset_index(inplace=True)
     df = pd.merge(df, tmp, how= 'left', on=[key, 'date'])
 
+    # calculate date +1, ..., +6, -1, ..., -6
     for i in range(6):
         tmp.columns = ['date+{}'.format(i + 1), key, 'cnt_day_{}+{}'.format(key_abbr, i + 1)]
         df = pd.merge(df, tmp, how= 'left', on= [key, 'date+{}'.format(i + 1)])
-        df['cnt_day_{}+{}'.format(key_abbr, i + 1)][df['cnt_day_{}+{}'.format(key_abbr, i + 1)].apply(lambda c: pd.isnull(c))] = 0
+        filter = pd.isnull(df['cnt_day_{}+{}'.format(key_abbr, i + 1)])
+        df.loc[filter, 'cnt_day_{}+{}'.format(key_abbr, i + 1)] = 0
 
         tmp.columns = ['date-{}'.format(i + 1), key, 'cnt_day_{}-{}'.format(key_abbr, i + 1)]
         df = pd.merge(df, tmp, how= 'left', on= [key, 'date-{}'.format(i + 1)])
-        df['cnt_day_{}-{}'.format(key_abbr, i + 1)][df['cnt_day_{}-{}'.format(key_abbr, i + 1)].apply(lambda c: pd.isnull(c))] = 0
+        filter = pd.isnull(df['cnt_day_{}-{}'.format(key_abbr, i + 1)])
+        df.loc[filter, 'cnt_day_{}-{}'.format(key_abbr, i + 1)] = 0
 
-    tmp = df.groupby(['yearmonth', key]).size().to_frame(name='cnt_mth_{}'.format(key_abbr))
+    # sum of project in the same month and same city
+    tmp = df.groupby(['yearmonth', key]).size().to_frame(name='cnt_monthly_by_{}'.format(key_abbr))
     tmp.reset_index(inplace=True)
     df = pd.merge(df, tmp, how='left', on=[key, 'yearmonth'])
 
@@ -47,16 +53,18 @@ def _cnt_wk_bwk_mth_combination(df, key):
     for i in range(3):
         cnt += df['cnt_day_{}+{}'.format(key_abbr, i + 1)]
         cnt += df['cnt_day_{}-{}'.format(key_abbr, i + 1)]
-    df['cnt_wk_' + key_abbr] = cnt
+    df['cnt_weekly_by_' + key_abbr] = cnt
 
     cnt = df['cnt_day_' + key]
     for i in range(6):
         cnt += df['cnt_day_{}+{}'.format(key_abbr, i + 1)]
         cnt += df['cnt_day_{}-{}'.format(key_abbr, i + 1)]
-    df['cnt_bwk_' + key_abbr] = cnt
+    df['cnt_biweekly_by_' + key_abbr] = cnt
 
     return df
 
+def _columns_to_write():
+    return ['projectid', 'ave_proj_cost_school_city', 'cnt_weekly_by_schoolid', 'cnt_biweekly_by_schoolid', 'cnt_monthly_by_schoolid', 'cnt_weekly_by_zip', 'cnt_biweekly_by_zip', 'cnt_monthly_by_zip', 'cnt_weekly_by_city', 'cnt_biweekly_by_city', 'cnt_monthly_by_city']
 
 
 if __name__ == '__main__':
@@ -67,8 +75,8 @@ if __name__ == '__main__':
 
     # delta of date
     date_delta = [_timedelta(1), _timedelta(2), _timedelta(3), _timedelta(4), _timedelta(5), _timedelta(6)]
-    projects_df['date'] = projects_df['date_posted'].apply(lambda d: datetime.datetime.strptime(d, '%Y-%m-%d') if not pd.isnull(d) else d)
-    projects_df['yearmonth'] = projects_df['date_posted'].apply(lambda d: datetime.datetime.strptime(d[:7], '%Y-%m') if not pd.isnull(d) else d)
+    projects_df['date'] = pd.to_datetime(projects_df['date_posted'], '%Y-%m-%d')
+    projects_df['yearmonth'] = pd.to_datetime(projects_df['date_posted'].str[:7], '%Y-%m')
 
     # introduce columns of dates from current_date + 6 to current_date - 6
     for i in range(6):
@@ -81,15 +89,26 @@ if __name__ == '__main__':
     projects_df = _cnt_wk_bwk_mth_combination(projects_df, 'school_city')
 
     # compute average cost of all project (excluding optional supports) for each school city
-    tmp = projects_df.groupby('school_city')['total_price_excluding_optional_support'].agg(np.mean).to_frame(name='price_school_city')
+    tmp = projects_df.groupby('school_city')['total_price_excluding_optional_support'].agg(np.mean).to_frame(name='ave_proj_cost_school_city')
     tmp.reset_index(inplace=True)
     projects_df = pd.merge(projects_df, tmp, how='left', on='school_city')
 
-    output_df = projects_df[['projectid', 'price_school_city', 'cnt_wk_schoolid', 'cnt_bwk_schoolid', 'cnt_mth_schoolid', 'cnt_wk_zip', 'cnt_bwk_zip', 'cnt_mth_zip', 'cnt_wk_city', 'cnt_bwk_city', 'cnt_mth_city']]
+    output_df = projects_df[_columns_to_write()]
 
-    output_df.to_csv(os.path.join('Features_csv', 'cnt_bw_wk_mth_combo.csv'), index=False)
+    # wrtie to csv
+    print('writing to csv')
+    output_df.to_csv(os.path.join('../Features_csv', 'cnt_bw_wk_mth_combo.csv'), index=False)
 
+    """
+    self correctness validation
+    columns_to_test = _columns_to_write()
+    columns_to_test.append('date_posted')
+    columns_to_test.append('schoolid')
+    columns_to_test.append('school_city')
+    columns_to_test.append('school_zip')
+    test_df = projects_df[columns_to_test]
+    test_df.sort(['schoolid', 'date_posted'], ascending=[1,1])[:50000].to_csv(os.path.join('../FeaturesValidations', 'cnt_bw_wk_mth_school.csv'))
+    test_df.sort(['school_zip', 'date_posted'], ascending=[1,1])[:50000].to_csv(os.path.join('../FeaturesValidations', 'cnt_bw_wk_mth_zip.csv'))
+    test_df.sort(['school_city', 'date_posted'], ascending=[1,1])[:50000].to_csv(os.path.join('../FeaturesValidations', 'cnt_bw_wk_mth_city.csv'))
 
-
-
-
+    """
