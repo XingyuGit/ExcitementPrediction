@@ -21,12 +21,35 @@ if __name__ == '__main__':
     
     #feature 42
     projects_df.loc[pd.isnull(projects_df['students_reached']),'students_reached'] = 0
+
+    ### Convert Category Data into numerical: Xuhui Chen
+    #
+    projects_df['metro'] = 0
+    projects_df.loc[projects_df['school_metro'] == 'urban', 'metro'] = 1
+    projects_df.loc[projects_df['school_metro'] == 'suburban', 'metro'] = 2
+    projects_df.loc[projects_df['school_metro'] == 'rural', 'metro'] = 3
+
+    #
+    projects_df['primary_subject'] = 0
+    projects_df.loc[projects_df['primary_focus_area'] == 'Literacy & Language', 'primary_subject'] = 1
+    projects_df.loc[projects_df['primary_focus_area'] == 'History & Civics', 'primary_subject'] = 2
+    projects_df.loc[projects_df['primary_focus_area'] == 'Math & Science', 'primary_subject'] = 3
+    projects_df.loc[projects_df['primary_focus_area'] == 'Health & Sports', 'primary_subject'] = 4
+    projects_df.loc[projects_df['primary_focus_area'] == 'Applied Learning', 'primary_subject'] = 5
+    projects_df.loc[projects_df['primary_focus_area'] == 'Music & The Arts', 'primary_subject'] = 6
+    projects_df.loc[projects_df['primary_focus_area'] == 'Special Needs', 'primary_subject'] = 7
+
+    #
+    projects_df['teacher_ny_fellow'] = 1
+    projects_df.loc[projects_df['teacher_ny_teaching_fellow'] == 'f', 'teacher_ny_fellow'] = 0
     
     #feature 45
-    projects_df.loc[projects_df['poverty_level'] == 'moderate', 'poverty_level'] = 1
-    projects_df.loc[projects_df['poverty_level'] == 'high poverty','poverty_level'] = 2
-    projects_df.loc[projects_df['poverty_level'] == 'highest poverty','poverty_level'] = 3
-    
+    projects_df['poverty'] = 0
+    projects_df.loc[projects_df['poverty_level'] == 'moderate poverty', 'poverty'] = 1
+    projects_df.loc[projects_df['poverty_level'] == 'high poverty','poverty'] = 2
+    projects_df.loc[projects_df['poverty_level'] == 'highest poverty','poverty'] = 3
+    projects_df.loc[projects_df['poverty_level'] == 'low poverty', 'poverty'] = 4
+
     #feature 75
     projects_df['price_per_student'] = projects_df['total_price_excluding_optional_support']/projects_df['students_reached']
     projects_df.loc[np.isinf(projects_df['price_per_student']),'price_per_student'] = 0
@@ -44,5 +67,5 @@ if __name__ == '__main__':
     projects_df = pd.merge(projects_df, temp_df, how='left', on='date_posted')
 
 
-    projects_df = projects_df[['projectid','school_metro', 'teacher_ny_teaching_fellow', 'students_reached', 'poverty_level', 'primary_focus_area','price_per_student','average_biweekly_predM1','average_monthly_predM1','average_bimonthly_predM1']]
+    projects_df = projects_df[['projectid','metro', 'teacher_ny_fellow', 'students_reached', 'poverty', 'primary_subject','price_per_student','average_biweekly_predM1','average_monthly_predM1','average_bimonthly_predM1']]
     projects_df.to_csv(os.path.join('../Features_csv', 'exciting_project_rolling_average.csv'), index=False)
