@@ -125,21 +125,21 @@ def _list_of_columns():
     'teacher_acctid_at_least_1_teacher_referred_donor_cumrate', 'schoolid_fully_funded_cumrate', 
     'teacher_acctid_fully_funded_cumrate', 'school_district_fully_funded_cumrate', 
     'schoolid_at_least_1_green_donation_cumrate', 'schoolid_great_chat_cumrate', 
-    'teacher_acctid_great_chat_cumrate', 'schoolid_cumcnt', 'teacher_acctid_cumcnt', 
-    'schoolid_is_teacher_acct_cumrate', 'teacher_acctid_is_teacher_acct_cumrate', 
-    'schoolid_donation_total_cumcnt', 'teacher_acctid_donation_total_cumcnt']
+    'teacher_acctid_great_chat_cumrate', 'schoolid_is_teacher_acct_cumrate', 
+    'teacher_acctid_is_teacher_acct_cumrate', 'schoolid_donation_total_cumcnt', 
+    'teacher_acctid_donation_total_cumcnt']
     return list_of_columns
 
 if __name__ == '__main__':
     # if path is not specified, default is 'Data'
     path = sys.argv[1] if len(sys.argv) > 1 else '../Data'
     # processing the whole file or refinement
-    bnew = sys.argv[2] == 'new' if len(sys.argv) > 2 else False
+    bnew = (sys.argv[2] == 'new') if len(sys.argv) > 2 else False
     
     whole_filepath = os.path.join('../Features_csv', 'history_stat.csv')
     refine_filepath = os.path.join('../Features_csv', 'refined_history_stat.csv')
 
-    if ~bnew and os.path.isfile(whole_filepath):
+    if not bnew and os.path.isfile(whole_filepath):
         print "reuse existing whole stat..."
         _select(whole_filepath, refine_filepath, _list_of_columns())
         sys.exit()
@@ -190,7 +190,8 @@ if __name__ == '__main__':
 
     # write to csv
     print 'write the whole to file: ' + whole_filepath + ' ...';
-    df = pd.merge(df, df2)
+    # merge + eliminate null
+    df = pd.merge(df, df2, how='left', on='projectid', suffixes=('', '_2')).fillna(0)
     df[list_to_write].to_csv(whole_filepath, index=False)
 
     # refinement
