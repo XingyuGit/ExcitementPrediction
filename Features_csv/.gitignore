@@ -2,3 +2,11 @@
 *
 # Except this file
 !.gitignore
+!adjusted_attributes.csv
+!cnt_bw_wk_mth_combo.csv
+!refined_history_stat.csv
+!essay_pred_val_3.csv
+!exciting_project_rolling_average.csv
+!project_eligibility_orgin.csv
+!resource_cnt.csv
+!general_plus_opt_support_stat.csv

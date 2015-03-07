@@ -1,18 +1,19 @@
 __author__ = 'TerryChen'
 
 #
-#   Features # 2, 3, 4, 5, 6
+# Features # 2, 3, 4, 5, 6
 #
 
 import os
 import sys
 import numpy as np
 import pandas as pd
-import random
 sys.path.append('..')
 import import_data
 
-def _get_adjusted_attribute(df, y, condition, key1, key2=None, key3=None, percentage_all_exciting='percentage_exciting_all', k=5, r=0.5):
+
+def _get_adjusted_attribute(df, y, condition, key1, key2=None, key3=None,
+                            percentage_all_exciting='percentage_exciting_all', k=5, r=0.5):
     """
         Take in account of exciting cnts, projects cnts,
         total exciting percentages, and random jitter
@@ -29,7 +30,7 @@ def _get_adjusted_attribute(df, y, condition, key1, key2=None, key3=None, percen
 
     # select attributes and do grouping
     df_selected = df[selected_attributes]
-    df_filtered = df_selected.loc[np.logical_and(condition, np.logical_not(pd.isnull(df_selected['y']))), :]
+    df_filtered = df_selected.loc[np.logical_and(condition, pd.notnull(df_selected['y'])), :]
     df_groups = df_filtered.groupby(group_attributes)
 
     df1 = df_groups.size().to_frame(name='projects_cnt')
@@ -48,14 +49,22 @@ def _get_adjusted_attribute(df, y, condition, key1, key2=None, key3=None, percen
     df_selected.loc[condition, 'projects_cnt'] -= 1
     df_selected.loc[condition, 'exciting_cnt'] -= df_selected.loc[condition, 'y']
     df_selected['expection_exciting'] = df_selected['projects_cnt'] / df_selected['exciting_cnt']
-    df_selected['adjusted_y'] = (df_selected['exciting_cnt'] + df_selected[percentage_all_exciting] * k) / (df_selected['projects_cnt'] + k)
-    df_selected.loc[pd.isnull(df_selected['expection_exciting']), 'expection_exciting'] = df_selected.loc[pd.isnull(df_selected['expection_exciting']), percentage_all_exciting]
-    df_selected.loc[pd.isnull(df_selected['adjusted_y']), 'adjusted_y'] = df_selected.loc[pd.isnull(df_selected['adjusted_y']), percentage_all_exciting]
+    df_selected['adjusted_y'] = (df_selected['exciting_cnt'] + df_selected[percentage_all_exciting] * k) / (
+        df_selected['projects_cnt'] + k)
+    df_selected.loc[pd.isnull(df_selected['expection_exciting']), 'expection_exciting'] = df_selected.loc[
+        pd.isnull(df_selected['expection_exciting']), percentage_all_exciting]
+    df_selected.loc[pd.isnull(df_selected['adjusted_y']), 'adjusted_y'] = df_selected.loc[
+        pd.isnull(df_selected['adjusted_y']), percentage_all_exciting]
 
     # apply random jitter for non-testing data
-    random_numbers = [random.random() for x in range(np.sum(condition))]
-    df_selected.loc[condition, 'adjusted_y'] *= [(x - 0.5) * r + 1 for x in random_numbers]
+    df_selected.loc[condition, 'adjusted_y'] *= (np.random.uniform(0, 1, np.sum(condition)) - 0.5) * r + 1
     return df_selected['adjusted_y']
+
+
+def _columns_to_write():
+    return ['projectid', 'teacher_acctid_is_exciting_adj_rate', 'schoolid_is_exciting_adj_rate', 'school_state_is_exciting_adj_rate', 'adj_subject',
+            'primary_subj_resource_type_is_adj_rate', 'secondary_subj_resource_type_is_adj_rate']
+
 
 if __name__ == '__main__':
     # if path is not specified, default is 'Data'
@@ -63,7 +72,8 @@ if __name__ == '__main__':
     projects_df = import_data.get_projects_df(path)
     outcomes_df = import_data.get_outcomes_df(path)
 
-    attributes = ['projectid', 'group', 'teacher_acctid', 'schoolid', 'school_state', 'primary_focus_subject', 'secondary_focus_subject', 'resource_type', 'y']
+    attributes = ['projectid', 'group', 'teacher_acctid', 'schoolid', 'school_state', 'primary_focus_subject',
+                  'secondary_focus_subject', 'resource_type', 'y']
 
     projects_df = projects_df[attributes[:-1]]
     outcomes_df = outcomes_df[[attributes[0], attributes[-1:][0]]]
@@ -76,16 +86,29 @@ if __name__ == '__main__':
     data_df['percentage_exciting_all'] = np.mean(data_df['y'])
 
     # set seed to current system time
-    random.seed(None)
-    data_df['adj_teacher_acctid'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test']==1, 'teacher_acctid', k=5, r=0.3)
-    data_df['adj_schoolid'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test']==1, 'schoolid', k=25, r=0.3)
-    data_df['adj_school_state'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test']==1, 'school_state', k=25, r=0.3)
-    data_df['adj_subject'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test']==1, 'primary_focus_subject',key2='secondary_focus_subject', k=20, r=0.3)
-    data_df['adj_primary_focus_subject_resource_type'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test']==1, 'primary_focus_subject',key2='resource_type', k=25, r=0.3)
-    data_df['adj_secondary_focus_subject_resource_type'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test']==1, 'secondary_focus_subject',key2='resource_type', k=25, r=0.3)
+    np.random.seed()
+    data_df['teacher_acctid_is_exciting_adj_rate'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'teacher_acctid',
+                                                            k=5, r=0.3)
+    data_df['schoolid_is_exciting_adj_rate'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'schoolid', k=25, r=0.3)
+    data_df['school_state_is_exciting_adj_rate'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'school_state', k=25,
+                                                          r=0.3)
+    data_df['adj_subject'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1, 'primary_focus_subject',
+                                                     key2='secondary_focus_subject', k=20, r=0.3)
+    data_df['primary_subj_resource_type_is_adj_rate'] = _get_adjusted_attribute(data_df, 'y', data_df['non_test'] == 1,
+                                                                                 'primary_focus_subject',
+                                                                                 key2='resource_type', k=25, r=0.3)
+    data_df['secondary_subj_resource_type_is_adj_rate'] = _get_adjusted_attribute(data_df, 'y',
+                                                                                   data_df['non_test'] == 1,
+                                                                                   'secondary_focus_subject',
+                                                                                   key2='resource_type', k=25, r=0.3)
 
-    data_df = data_df[['projectid', 'adj_teacher_acctid', 'adj_schoolid', 'adj_school_state', 'adj_subject', 'adj_primary_focus_subject_resource_type', 'adj_secondary_focus_subject_resource_type']]
+    data_df = data_df[_columns_to_write()]
 
     # wrtie to csv
     print('writing to csv')
     data_df.to_csv(os.path.join('../Features_csv', 'adjusted_attributes.csv'), index=False)
+
+    """
+    self correctness validation
+    data_df[:50000].to_csv(os.path.join('../FeaturesValidations', 'adjusted_attributes.csv'), index=False)
+    """
