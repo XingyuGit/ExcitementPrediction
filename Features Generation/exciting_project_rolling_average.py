@@ -56,15 +56,23 @@ if __name__ == '__main__':
 
     
     #feature 82,83,84
-    projects_df['predM1'] = 0
-    projects_df.ix[::2,'predM1'] = 1
+    pred_fn = 'gbm1_predict_all.csv'
+    filepath = os.path.join('../Prediction/', pred_fn)
+
+    if os.path.isfile(filepath):
+        print 'gbm1 result exists'
+        pred_df = pd.read_csv(filepath)
+        projects_df['predM1'] = pred_df['gbm1_predict_y']
+    else:
+        projects_df['predM1'] = 0
+        projects_df.ix[::2,'predM1'] = 1
     pysqldf = lambda q: sqldf(q,globals())
     temp_df = pysqldf("select count(projectid) as numOfProjects,date_posted ,sum(predM1) as sumOfPredM1 from projects_df where date_posted >= '2010-09-01' group by date_posted")
     _get_average(temp_df,14,'sumOfPredM1','numOfProjects','average_biweekly_predM1')
     _get_average(temp_df,30,'sumOfPredM1','numOfProjects','average_monthly_predM1')
     _get_average(temp_df,61,'sumOfPredM1','numOfProjects','average_bimonthly_predM1')
     temp_df = temp_df[['date_posted','average_biweekly_predM1','average_monthly_predM1','average_bimonthly_predM1']]
-    projects_df = pd.merge(projects_df, temp_df, how='left', on='date_posted')
+    projects_df = pd.merge(projects_df, temp_df, how='left', on='date_posted').fillna(0)
 
 
     projects_df = projects_df[['projectid','metro', 'teacher_ny_fellow', 'students_reached', 'poverty', 'primary_subject','price_per_student','average_biweekly_predM1','average_monthly_predM1','average_bimonthly_predM1']]

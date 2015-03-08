@@ -93,7 +93,7 @@ if __name__ == '__main__':
     tmp.reset_index(inplace=True)
     projects_df = pd.merge(projects_df, tmp, how='left', on='school_city')
 
-    output_df = projects_df[_columns_to_write()]
+    output_df = projects_df[_columns_to_write()].fillna(0)
 
     # wrtie to csv
     print('writing to csv')
