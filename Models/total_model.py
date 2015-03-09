@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     features = read_features(features_fn)
     m = model.train_mode(model='gbm', features=features)
-    m.set_model_parameters(number_trees=7300, learning_rate=0.01, min_sample_split=100, max_leaf_nodes=7)
+    m.set_model_parameters(number_trees=650, learning_rate=0.1, min_sample_split=100, max_leaf_nodes=2)
     m.train_and_predict(input_files=input_files, output_fn=output_file.format("gbm"))
 
     m = model.train_mode(model='et', features=features)
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     m.train_and_predict(input_files=input_files, output_fn=output_file.format("et"))
 
     m = model.train_mode(model='rf', features=features)
-    m.set_model_parameters(number_trees=5000, max_leaf_nodes=10, max_features=2)
+    m.set_model_parameters(number_trees=650, max_leaf_nodes=10, max_features=2)
     m.train_and_predict(input_files=input_files, output_fn=output_file.format("rf"))
 
     gbm = pd.read_csv(os.path.join('../Prediction', 'total_predict_gbm.csv'))
