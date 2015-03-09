@@ -33,7 +33,7 @@ if __name__ == '__main__':
     features = read_features(features_fn)
 
     param_grid = {
-            'n_estimators': [1000],
+            'n_estimators': [650],
             'learning_rate': [0.1],
             'subsample': [0.5],
             'min_samples_split': [100],
