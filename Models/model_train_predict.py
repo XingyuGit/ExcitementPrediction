@@ -21,20 +21,19 @@ class train_mode:
     def get_model_name(self):
         return self.model
 
-    def set_model_parameters(self, number_trees, learning_rate=0.1, min_sample_split=750, loss='deviance',
+    def set_model_parameters(self, number_trees, learning_rate=0.05, min_sample_split=400, loss='deviance',
                              subsample=0.5, max_leaf_nodes=8, max_features=2):
         """
 
         :type self: model object
         """
         self._parameters['n_estimators'] = number_trees
-        self._parameters['min_samples_split'] = min_sample_split
         self._parameters['max_leaf_nodes'] = max_leaf_nodes
         self._parameters['verbose'] = 1
 
         if self.model == 'gbm':
             self._parameters['learning_rate'] = learning_rate
-            self._parameters['loss'] = loss
+            self._parameters['min_samples_split'] = min_sample_split
             self._parameters['subsample'] = subsample
         else:
             self._parameters['max_features'] = max_features

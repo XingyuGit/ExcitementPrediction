@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     features = read_features(features_fn)
     gbm = model.train_mode(model='et', features=features)
-    gbm.set_model_parameters(number_trees=3000, min_sample_split=750, max_leaf_nodes=100, max_features=2)
+    gbm.set_model_parameters(number_trees=3000, max_leaf_nodes=100, max_features=2)
     gbm.train_and_predict(input_files=input_files, output_fn=output_file)
 
 
