@@ -45,3 +45,7 @@ teacher_acctid_is_teacher_acct_cumrate
 schoolid_donation_total_cumcnt
 teacher_acctid_donation_total_cumcnt
 average_bimonthly_predM1
+essay_cap_len
+essay_cap_per
+title_cap_len
+title_cap_per

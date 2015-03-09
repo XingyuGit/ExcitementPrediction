@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     features = read_features(features_fn)
     gbm = model.train_mode(model='gbm', features=features)
-    gbm.set_model_parameters(number_trees=650)
+    gbm.set_model_parameters(number_trees=800)
     gbm.train_and_predict(input_files=input_files, output_fn=output_file)
 
 

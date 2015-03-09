@@ -28,7 +28,7 @@ if __name__ == '__main__':
     et1 = pd.read_csv(os.path.join('../Prediction', 'et1_predict.csv'))
 
     projects_df['pred1'] = 0.1 * gbm1['is_exciting'] + 0.1 * gbm2['is_exciting'] + 0.45 * gbm3['is_exciting'] + 0.1 * gbm4['is_exciting'] + 0.25 * et1['is_exciting']
-    projects_df['is_exiciting'] = projects_df['pred1'] * projects_df['discount']
+    projects_df['is_exciting'] = projects_df['pred1'] * projects_df['discount']
 
 
     outcome_df_dis = projects_df[['projectid', 'is_exciting']]
