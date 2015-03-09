@@ -48,5 +48,6 @@ def validate(model, features, parameters, parameters_grid, input_files):
     print "\nFeature importance:"
     fi = pd.DataFrame({"features": features, "importance": grid_search.best_estimator_.feature_importances_})
     fi = fi.sort("importance", ascending=False)
+    fi.to_csv("../Temp/total_importance.txt", index=False)
     print fi
 
