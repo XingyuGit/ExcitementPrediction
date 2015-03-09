@@ -21,7 +21,7 @@ def validate(model, features, parameters, parameters_grid, input_files):
     df.columns = ['projectid', 'dataset', 'outcome_y']
     for x in range(len(input_files)):
         input_df = pd.read_csv(os.path.join('../Features_csv', input_files[x]))
-        df = pd.merge(df, input_df, how='left', on='projectid')
+        df = pd.merge(df, input_df, how='left', on='projectid', suffixes=('', '_x'))
 
     x_train_df = df[features][(df['dataset'] == 'valid') | (df['dataset'] == 'train')]
     y_train_df = df['y'][(df['dataset'] == 'valid') | (df['dataset'] == 'train')]
@@ -44,3 +44,9 @@ def validate(model, features, parameters, parameters_grid, input_files):
 
     print "\nGrid score:"
     pprint(grid_search.grid_scores_)
+
+    print "\nFeature importance:"
+    fi = pd.DataFrame({"features": features, "importance": grid_search.best_estimator_.feature_importances_})
+    fi = fi.sort("importance", ascending=False)
+    print fi
+
