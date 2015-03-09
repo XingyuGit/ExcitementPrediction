@@ -21,10 +21,10 @@ def validate(model, features, parameters, parameters_grid, input_files):
     df.columns = ['projectid', 'dataset', 'outcome_y']
     for x in range(len(input_files)):
         input_df = pd.read_csv(os.path.join('../Features_csv', input_files[x]))
-        df = pd.merge(df, input_df, how='left', on='projectid')
+        df = pd.merge(df, input_df, how='left', on='projectid', suffixes=('', '_x'))
 
     x_train_df = df[features][(df['dataset'] == 'valid') | (df['dataset'] == 'train')]
-    y_train_df = df['y'][(df['dataset'] == 'valid') | (df['dataset'] == 'train')]
+    y_train_df = df['outcome_y'][(df['dataset'] == 'valid') | (df['dataset'] == 'train')]
     random.seed()
 
     if model == 'gbm':
