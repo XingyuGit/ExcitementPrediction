@@ -21,11 +21,8 @@ class train_mode:
     def get_model_name(self):
         return self.model
 
-<<<<<<< HEAD
-    def set_model_parameters(self, number_trees, learning_rate=0.05, min_sample_split=400, loss='deviance',
-=======
-    def set_model_parameters(self, number_trees, learning_rate=0.1, min_sample_split=750,
->>>>>>> master
+
+    def set_model_parameters(self, number_trees, learning_rate=0.05, min_sample_split=400,
                              subsample=0.5, max_leaf_nodes=8, max_features=2):
         """
 
@@ -38,10 +35,6 @@ class train_mode:
         if self.model == 'gbm':
             self._parameters['min_samples_split'] = min_sample_split
             self._parameters['learning_rate'] = learning_rate
-<<<<<<< HEAD
-            self._parameters['min_samples_split'] = min_sample_split
-=======
->>>>>>> master
             self._parameters['subsample'] = subsample
         else:
             self._parameters['max_features'] = max_features
