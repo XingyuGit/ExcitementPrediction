@@ -4,6 +4,7 @@ import os
 import sys
 import model_train_predict as model
 import import_data
+import pandas as pd
 
 def read_features(read_fn):
     f = open(read_fn, 'r')
@@ -26,16 +27,29 @@ if __name__ == '__main__':
     fn9 = 'exciting_project_rolling_average.csv'
 
     input_files = [fn1, fn2, fn3, fn4, fn5, fn6, fn7, fn8, fn9]
-    output_file = 'total_predict.csv'
+    output_file = 'total_predict_{}.csv'
     features_fn = 'total_features.txt'
 
     features = read_features(features_fn)
-    gbm = model.train_mode(model='gbm', features=features)
-    gbm.set_model_parameters(number_trees=7300, learning_rate=0.01, min_sample_split=100, max_leaf_nodes=7)
-    gbm.train_and_predict(input_files=input_files, output_fn=output_file)
+    m = model.train_mode(model='gbm', features=features)
+    m.set_model_parameters(number_trees=7300, learning_rate=0.01, min_sample_split=100, max_leaf_nodes=7)
+    m.train_and_predict(input_files=input_files, output_fn=output_file.format("gbm"))
 
+    m = model.train_mode(model='et', features=features)
+    m.set_model_parameters(number_trees=3000, max_leaf_nodes=100, max_features=2)
+    m.train_and_predict(input_files=input_files, output_fn=output_file.format("et"))
 
+    m = model.train_mode(model='rf', features=features)
+    m.set_model_parameters(number_trees=5000, max_leaf_nodes=10, max_features=2)
+    m.train_and_predict(input_files=input_files, output_fn=output_file.format("rf"))
 
+    gbm = pd.read_csv(os.path.join('../Prediction', 'total_predict_gbm.csv'))
+    et = pd.read_csv(os.path.join('../Prediction', 'total_predict_et.csv'))
+    rf = pd.read_csv(os.path.join('../Prediction', 'total_predict_rf.csv'))
+
+    m = gbm.copy()
+    m['is_exciting'] = 0.45 * gbm['is_exciting'] + 0.45 * et['is_exciting'] + 0.1 * rf['is_exciting']
+    m.to_csv(os.path.join('../Prediction', 'total_predict_combine.csv'), index=False)
 
 
 

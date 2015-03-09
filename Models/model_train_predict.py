@@ -21,20 +21,19 @@ class train_mode:
     def get_model_name(self):
         return self.model
 
-    def set_model_parameters(self, number_trees, learning_rate=0.1, min_sample_split=750, loss='deviance',
+    def set_model_parameters(self, number_trees, learning_rate=0.1, min_sample_split=750,
                              subsample=0.5, max_leaf_nodes=8, max_features=2):
         """
 
         :type self: model object
         """
         self._parameters['n_estimators'] = number_trees
-        self._parameters['min_samples_split'] = min_sample_split
         self._parameters['max_leaf_nodes'] = max_leaf_nodes
         self._parameters['verbose'] = 1
 
         if self.model == 'gbm':
+            self._parameters['min_samples_split'] = min_sample_split
             self._parameters['learning_rate'] = learning_rate
-            self._parameters['loss'] = loss
             self._parameters['subsample'] = subsample
         else:
             self._parameters['max_features'] = max_features
@@ -117,4 +116,10 @@ class train_mode:
         output_y_df.to_csv(os.path.join('../Prediction', output_fn), index=False)
         output_all_df.to_csv(os.path.join('../Prediction', output_fn[:-4] + '_all.csv'), index=False)
 
+        # write feature importance
+        output_importance_fn = os.path.join('../Importance', output_fn[:-4] + '_feature_importance.csv')
+        print('write importance: ' + output_importance_fn)
+        fi = pd.DataFrame({"features": self._features, "importance": clf.feature_importances_})
+        fi = fi.sort("importance", ascending=False)
+        fi.to_csv(output_importance_fn, index=False)
 
