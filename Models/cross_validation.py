@@ -44,3 +44,9 @@ def validate(model, features, parameters, parameters_grid, input_files):
 
     print "\nGrid score:"
     pprint(grid_search.grid_scores_)
+
+    print "\nFeature importance:"
+    fi = pd.DataFrame({"features": features, "importance": grid_search.best_estimator_.feature_importances_})
+    fi = fi.sort("importance", ascending=False)
+    print fi
+
