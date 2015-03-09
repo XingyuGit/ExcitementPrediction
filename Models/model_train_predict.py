@@ -92,15 +92,19 @@ class train_mode:
         clf.fit(x_train_matrix, y_train_matrix)
 
         end_time = time.time()
-        print('build and train model: {}s', str(end_time - start_time))
+        print('build and train model: %0.3f seconds' % (end_time - start_time))
 
-        #   predict and convert to dataframe for writing
+        #  predict and convert to dataframe for writing
         print('predict values')
         y_all_matrix = clf.predict_proba(df[self._features].as_matrix())
-        y_test_matrix = clf.predict_proba(x_test_matrix)
-        y_all_df = pd.DataFrame({'{}_all_y'.format(output_fn[:-4]): y_all_matrix})
+        # y_test_matrix = clf.predict_proba(x_test_matrix)
+        # 2nd column (probability of 1)
+        y_all_matrix = y_all_matrix[:,1] 
+        # y_test_matrix = y_test_matrix[:,1]
+
+        # y_all_df = pd.DataFrame({'{}_all_y'.format(output_fn[:-4]): y_all_matrix})
         #y_all_df = pd.DataFrame(y_all_matrix, columns='{}_all_y'.format(output_fn[:-4]))
-        y_test_df = pd.DataFrame({'{}_y'.format(output_fn[:-4]): y_test_matrix})
+        # y_test_df = pd.DataFrame({'{}_y'.format(output_fn[:-4]): y_test_matrix})
         #y_test_df = pd.DataFrame(y_test_matrix, columns='{}_y'.format(output_fn[:-4]))
 
         df['{}_y'.format(output_fn[:-4])] = y_all_matrix
