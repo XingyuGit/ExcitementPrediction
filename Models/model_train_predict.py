@@ -96,8 +96,8 @@ class train_mode:
 
         #   predict and convert to dataframe for writing
         print('predict values')
-        y_all_matrix = clf.predict(df[self._features].as_matrix())
-        y_test_matrix = clf.predict(x_test_matrix)
+        y_all_matrix = clf.predict_proba(df[self._features].as_matrix())
+        y_test_matrix = clf.predict_proba(x_test_matrix)
         y_all_df = pd.DataFrame({'{}_all_y'.format(output_fn[:-4]): y_all_matrix})
         #y_all_df = pd.DataFrame(y_all_matrix, columns='{}_all_y'.format(output_fn[:-4]))
         y_test_df = pd.DataFrame({'{}_y'.format(output_fn[:-4]): y_test_matrix})
