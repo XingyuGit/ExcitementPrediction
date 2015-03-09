@@ -60,7 +60,7 @@ class gbm:
         clf.fit(x_train_matrix, y_train_matrix)
 
         #   predict and convert to dataframe for writing
-        y_test_matrix = clf.predict(x_test_matrix)
+        y_test_matrix = clf.predict_proba(x_test_matrix)
         y_test_df = pd.DataFrame(y_test_matrix, columns='y')
 
         # write to file
