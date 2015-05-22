@@ -5,6 +5,7 @@ import sys
 sys.path.append('..')
 import import_data
 import pandas as pd
+import random
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -17,16 +18,18 @@ def validate(model, features, parameters, parameters_grid, input_files):
     outcomes_df = import_data.get_outcomes_df(data_path)
     projects_df = import_data.get_projects_df(data_path)
     df = pd.merge(projects_df, outcomes_df, how='left', on='projectid')[['projectid', 'group', 'y']]
+    df.columns = ['projectid', 'dataset', 'outcome_y']
     for x in range(len(input_files)):
-        input_df = pd.read_csv(os.path.join('../Features_csv'), input_files[x])
-        df = pd.merge(df, input_df, how='left', on='projectid')
+        input_df = pd.read_csv(os.path.join('../Features_csv', input_files[x]))
+        df = pd.merge(df, input_df, how='left', on='projectid', suffixes=('', '_x'))
 
-    x_train_df = df[features][(df['group'] == 'valid') | (df['group'] == 'train')]
-    y_train_df = df['y'][(df['group'] == 'valid') | (df['group'] == 'train')]
+    x_train_df = df[features][(df['dataset'] == 'valid') | (df['dataset'] == 'train')]
+    y_train_df = df['outcome_y'][(df['dataset'] == 'valid') | (df['dataset'] == 'train')]
+    random.seed()
 
-    if model is 'gbm':
+    if model == 'gbm':
         clf = GradientBoostingClassifier(**parameters)
-    elif model is 'et':
+    elif model == 'et':
         clf = ExtraTreesClassifier(**parameters)
     else:
         clf = RandomForestClassifier(**parameters)
@@ -41,3 +44,10 @@ def validate(model, features, parameters, parameters_grid, input_files):
 
     print "\nGrid score:"
     pprint(grid_search.grid_scores_)
+
+    print "\nFeature importance:"
+    fi = pd.DataFrame({"features": features, "importance": grid_search.best_estimator_.feature_importances_})
+    fi = fi.sort("importance", ascending=False)
+    fi.to_csv("../Temp/total_importance.txt", index=False)
+    print fi
+

@@ -24,7 +24,7 @@ if __name__ == '__main__':
     resource_df = resource_df[['project_resource_type', 'item_quantity', 'projectid', 'resourceid']]
 
     #feature 10: teacher_gender
-    projects_df['teacher_gender'] = np.nan
+    projects_df['teacher_gender'] = 0
     projects_df.loc[projects_df['teacher_prefix'] == '', 'teacher_gender'] = 0
     projects_df.loc[projects_df['teacher_prefix'] == 'Dr.', 'teacher_gender'] = 1
     projects_df.loc[projects_df['teacher_prefix'] == 'Mr.', 'teacher_gender'] = 2
@@ -33,9 +33,9 @@ if __name__ == '__main__':
     projects_df.loc[projects_df['teacher_prefix'] == 'Ms.', 'teacher_gender'] = 5
 
     #feature 11: teach_in_america
-    projects_df['teach_in_america'] = np.nan
-    projects_df.loc[projects_df['teacher_teach_for_america'] == 'f', 'teach_in_america'] = 0
-    projects_df.loc[projects_df['teacher_teach_for_america'] == 't', 'teach_in_america'] = 1
+    projects_df['teach_in_america'] = 0
+    projects_df.loc[projects_df['teacher_teach_for_america'] == 'f', 'teach_in_america'] = 1
+    projects_df.loc[projects_df['teacher_teach_for_america'] == 't', 'teach_in_america'] = 2
 
     #feature 12: students_cnt
     projects_df['students_cnt'] = projects_df['students_reached']
